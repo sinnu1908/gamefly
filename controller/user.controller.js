@@ -7,7 +7,10 @@ require("dotenv").config();
 const registerUser=async(req,res)=>{
     console.log(req.body)
     const {name,email,mobile_No,password}=req.body;
-    const userAvailable=await userModel.findOne({$or:[{email},{mobile_No}]});
+
+    try {
+
+        const userAvailable=await userModel.findOne({$or:[{email},{mobile_No}]});
 
     if(userAvailable){
      res.status(200).json({msg:"User is already registered with us, Please Login...!"})
@@ -17,12 +20,18 @@ const registerUser=async(req,res)=>{
          if(err){
              res.status(400).json({msg:"Something went wrong please try again sometime"})
          }else{
-            let newUser=new userModel({name,email,mobile_No,password:hash,});
+            let newUser=new userModel({name,email,mobile_No,password:hash});
             await newUser.save();
             res.status(201).json({msg:"Registration Successfull !, Please Login...", User:req.body})
          }
      });
     }
+        
+    } catch (error) {
+        res.status(401).json({error})
+
+    }
+    
  }
 
  //Login User
